@@ -4,7 +4,9 @@ import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.filter.LoggingFilter;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.util.StringUtils;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -51,18 +53,29 @@ public class OwmClient {
         this.temp = temp;
     }
 
-    private void apiCall() {
+    private void apiCall() throws ResponseStatusException {
         Client client = ClientBuilder.newClient( new ClientConfig().register( LoggingFilter.class) );
+        city = city.replace("%20", "+").replace(" ", "+");
         WebTarget webTarget = client.target(String.format("%s?q=%s&APPID=%s&units=metric", URL, city, APIKEY));
+        Invocation.Builder invocationBuilder;
+        invocationBuilder = webTarget.request(MediaType.APPLICATION_JSON);
 
-        Invocation.Builder invocationBuilder =  webTarget.request(MediaType.APPLICATION_JSON);
         Response response = invocationBuilder.get();
-        JSONObject jsonObject = new JSONObject(response.readEntity(String.class));
-        JSONObject main = (JSONObject) jsonObject.get("main");
-        String temp = main.get("temp").toString();
-        this.setTemp(temp);
-        JSONArray weather = (JSONArray) jsonObject.get("weather");
-        String description = (String) weather.getJSONObject(0).get("description");
-        this.setDescription(StringUtils.capitalize(description));
+        if (response.getStatus() == 200) {
+            JSONObject jsonObject = new JSONObject(response.readEntity(String.class));
+            JSONObject main = (JSONObject) jsonObject.get("main");
+            String temp = main.get("temp").toString();
+            this.setTemp(temp);
+            JSONArray weather = (JSONArray) jsonObject.get("weather");
+            String description = (String) weather.getJSONObject(0).get("description");
+            this.setDescription(StringUtils.capitalize(description));
+        } else if (response.getStatus() == 404) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "City " + this.city + " not found"
+            );
+        } else {
+            HttpStatus status = HttpStatus.resolve(response.getStatus());
+            throw new ResponseStatusException(status, status.getReasonPhrase());
+        }
     }
 }
