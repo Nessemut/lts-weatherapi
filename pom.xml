@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.ltstest</groupId>
     <artifactId>weatherapi</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>weatherapi</name>
     <description>Weather API for LTS Beratung</description>
 
