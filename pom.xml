@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.ltstest</groupId>
-    <artifactId>demo</artifactId>
+    <artifactId>weatherapi</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>weatherapi</name>
     <description>Weather API for LTS Beratung</description>
