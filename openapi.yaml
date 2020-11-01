@@ -1,0 +1,47 @@
+openapi: 3.0.0
+
+info:
+  title: Weather API
+  description: Demo project for LTS Beratung
+  version: 1.0.0
+  contact:
+    name: Samuel Segura
+    email: samuel3107@gmail.com
+
+servers:
+  - url: '{protocol}://{environment}.com'
+    variables:
+      environment:
+        default: api
+        enum:
+          - api
+      protocol:
+        default: https
+        enum:
+          - https
+
+paths:
+  /weather/{city}:
+    get:
+      summary: Returns a user by ID.
+      parameters:
+        - name: city
+          in: path
+          required: true
+          description: The name of the city to check.
+      responses:
+        '200':
+          description: Current condition and temperature in the city.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  condition:
+                    type: string
+                    example: Few clouds
+                  temperature:
+                    type: string
+                    example: "14.62"
+        '404':
+          description: The city was not found
